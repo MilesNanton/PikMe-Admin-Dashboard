@@ -1,0 +1,72 @@
+/* [project]/app/compact-header.css [app-client] (css) */
+@font-face {
+  font-family: Pixelated Elegance;
+  src: url("/fonts/pixelated-elegance.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Azeret Mono;
+  src: url("/fonts/azeret-mono-semibold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+.reference-login {
+  --pixel-font: "Pixelated Elegance", monospace;
+}
+
+.reference-logo {
+  letter-spacing: 0;
+  font-family: Pixelated Elegance, monospace;
+  font-weight: 400;
+}
+
+.flag-brand {
+  height: 80px;
+}
+
+.flag-brand span {
+  letter-spacing: 0;
+  font-family: Pixelated Elegance, monospace;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.flag-title {
+  height: 94px;
+}
+
+.flag-title, .flag-card h1 {
+  letter-spacing: 0;
+  font-family: Azeret Mono, monospace;
+  font-weight: 600;
+}
+
+.flag-card {
+  min-height: calc(100svh - 212px);
+}
+
+@media (max-width: 800px) {
+  .flag-brand {
+    height: 62px;
+  }
+
+  .flag-brand span {
+    font-size: 25px;
+  }
+
+  .flag-title {
+    height: 68px;
+  }
+
+  .flag-card {
+    min-height: calc(100svh - 142px);
+  }
+}
+
+/*# sourceMappingURL=app_compact-header_css_1igg3k2-ikub5._.single.css.map*/

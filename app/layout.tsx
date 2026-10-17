@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./login-reference.css";
+import "./dashboard-reference.css";
+import "./compact-header.css";
 
 export const metadata: Metadata = {
   title: "PikMe · Admin",

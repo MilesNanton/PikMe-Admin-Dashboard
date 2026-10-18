@@ -15,11 +15,12 @@
 }
 
 .reference-login {
-  --pixel-font: "Pixelated Elegance", monospace;
+  --pixel-font: var(--font-pixelated), "Pixelated Elegance", monospace;
 }
 
-.reference-logo {
-  font-family: "Pixelated Elegance", monospace;
+.reference-logo,
+.reference-form-wrap h1 {
+  font-family: var(--font-pixelated), "Pixelated Elegance", monospace;
   font-weight: 400;
   letter-spacing: 0;
 }

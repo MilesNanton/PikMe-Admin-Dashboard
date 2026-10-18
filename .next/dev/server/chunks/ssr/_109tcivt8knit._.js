@@ -14,6 +14,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 ;
 ;
+;
 const metadata = {
     title: "PikMe · Admin",
     description: "PikMe trust and safety administration dashboard"
@@ -30,12 +31,12 @@ function RootLayout({ children }) {
             children: children
         }, void 0, false, {
             fileName: "[project]/app/layout.tsx",
-            lineNumber: 17,
+            lineNumber: 18,
             columnNumber: 26
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/layout.tsx",
-        lineNumber: 17,
+        lineNumber: 18,
         columnNumber: 10
     }, this);
 }

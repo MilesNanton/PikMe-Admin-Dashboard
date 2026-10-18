@@ -25,6 +25,79 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 const readableReason = (value)=>value.replaceAll("_", " ").replaceAll("-", " ").replace(/\b\w/g, (l)=>l.toUpperCase());
+function readDrawing(value) {
+    if (!value || typeof value !== "object") return null;
+    const snapshot = value;
+    if (!Array.isArray(snapshot.pikStrokes)) return null;
+    const strokes = snapshot.pikStrokes.map((stroke)=>{
+        if (!stroke || typeof stroke !== "object" || !Array.isArray(stroke.points)) return [];
+        return stroke.points.flatMap((point)=>{
+            if (!point || typeof point !== "object") return [];
+            const { x, y } = point;
+            return typeof x === "number" && typeof y === "number" ? [
+                {
+                    x,
+                    y
+                }
+            ] : [];
+        });
+    }).filter((stroke)=>stroke.length > 0);
+    if (!strokes.length) return null;
+    const furthest = strokes.flat().reduce((size, point)=>({
+            x: Math.max(size.x, point.x),
+            y: Math.max(size.y, point.y)
+        }), {
+        x: 1,
+        y: 1
+    });
+    return {
+        strokes,
+        width: typeof snapshot.canvasWidth === "number" && snapshot.canvasWidth > 0 ? snapshot.canvasWidth : typeof snapshot.pikCanvasWidth === "number" && snapshot.pikCanvasWidth > 0 ? snapshot.pikCanvasWidth : furthest.x,
+        height: typeof snapshot.canvasHeight === "number" && snapshot.canvasHeight > 0 ? snapshot.canvasHeight : typeof snapshot.pikCanvasHeight === "number" && snapshot.pikCanvasHeight > 0 ? snapshot.pikCanvasHeight : furthest.y,
+        strokeColor: typeof snapshot.strokeColor === "string" ? snapshot.strokeColor : "#222222",
+        strokeWidth: typeof snapshot.strokeWidth === "number" ? snapshot.strokeWidth : 2,
+        backgroundColor: typeof snapshot.backgroundColor === "string" ? snapshot.backgroundColor : "#F7F7F7"
+    };
+}
+function DrawingPreview({ drawing }) {
+    if (!drawing) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+        className: "flag-preview-fallback",
+        "aria-label": "Drawing preview unavailable",
+        children: "◷"
+    }, void 0, false, {
+        fileName: "[project]/app/page.tsx",
+        lineNumber: 38,
+        columnNumber: 22
+    }, this);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        className: "flag-preview",
+        viewBox: `0 0 ${drawing.width} ${drawing.height}`,
+        preserveAspectRatio: "xMidYMid meet",
+        role: "img",
+        "aria-label": "Reported drawing",
+        style: {
+            backgroundColor: drawing.backgroundColor
+        },
+        children: drawing.strokes.map((stroke, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("polyline", {
+                points: stroke.map((point)=>`${point.x},${point.y}`).join(" "),
+                fill: "none",
+                stroke: drawing.strokeColor,
+                strokeWidth: drawing.strokeWidth,
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                vectorEffect: "non-scaling-stroke"
+            }, index, false, {
+                fileName: "[project]/app/page.tsx",
+                lineNumber: 39,
+                columnNumber: 255
+            }, this))
+    }, void 0, false, {
+        fileName: "[project]/app/page.tsx",
+        lineNumber: 39,
+        columnNumber: 10
+    }, this);
+}
+_c = DrawingPreview;
 function Home() {
     _s();
     const [user, setUser] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null), [ready, setReady] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false), [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(""), [password, setPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(""), [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(""), [loggingIn, setLoggingIn] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false), [reports, setReports] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]), [loadingReports, setLoadingReports] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -58,17 +131,30 @@ function Home() {
             setLoadingReports(true);
             const q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$common$2d$D9UYuXJO$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__aS__as__collection$3e$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$firebase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], "reports"), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["orderBy"])("createdAt", "desc"));
             return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["onSnapshot"])(q, {
-                "Home.useEffect": (snapshot)=>{
-                    setReports(snapshot.docs.map({
-                        "Home.useEffect": (item)=>{
+                "Home.useEffect": async (snapshot)=>{
+                    const latestDrawings = new Map();
+                    const items = await Promise.all(snapshot.docs.map({
+                        "Home.useEffect": async (item)=>{
                             const data = item.data();
+                            const reportedUserId = String(data.reportedUserId ?? "Unknown user");
+                            let drawing = readDrawing(data.contentSnapshot);
+                            if (!drawing && reportedUserId !== "Unknown user") {
+                                if (!latestDrawings.has(reportedUserId)) latestDrawings.set(reportedUserId, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$common$2d$D9UYuXJO$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__v__as__doc$3e$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$firebase$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], "nearby_presence", reportedUserId)).then({
+                                    "Home.useEffect": (result)=>result.exists() ? readDrawing(result.data()) : null
+                                }["Home.useEffect"]).catch({
+                                    "Home.useEffect": ()=>null
+                                }["Home.useEffect"]));
+                                drawing = await latestDrawings.get(reportedUserId);
+                            }
                             return {
                                 id: item.id,
                                 reason: String(data.reason ?? "Community report"),
-                                reportedUserId: String(data.reportedUserId ?? "Unknown user")
+                                reportedUserId,
+                                drawing
                             };
                         }
                     }["Home.useEffect"]));
+                    setReports(items);
                     setLoadingReports(false);
                 }
             }["Home.useEffect"], {
@@ -121,17 +207,17 @@ function Home() {
                 children: "PikMe"
             }, void 0, false, {
                 fileName: "[project]/app/page.tsx",
-                lineNumber: 21,
+                lineNumber: 52,
                 columnNumber: 91
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/page.tsx",
-            lineNumber: 21,
+            lineNumber: 52,
             columnNumber: 54
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/page.tsx",
-        lineNumber: 21,
+        lineNumber: 52,
         columnNumber: 20
     }, this);
     if (!user) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -144,12 +230,12 @@ function Home() {
                     children: "PikMe"
                 }, void 0, false, {
                     fileName: "[project]/app/page.tsx",
-                    lineNumber: 22,
+                    lineNumber: 53,
                     columnNumber: 90
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.tsx",
-                lineNumber: 22,
+                lineNumber: 53,
                 columnNumber: 53
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -161,7 +247,7 @@ function Home() {
                             children: "Log in to PikMe"
                         }, void 0, false, {
                             fileName: "[project]/app/page.tsx",
-                            lineNumber: 22,
+                            lineNumber: 53,
                             columnNumber: 226
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -173,7 +259,7 @@ function Home() {
                                             children: "EMAIL"
                                         }, void 0, false, {
                                             fileName: "[project]/app/page.tsx",
-                                            lineNumber: 22,
+                                            lineNumber: 53,
                                             columnNumber: 280
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -184,13 +270,13 @@ function Home() {
                                             required: true
                                         }, void 0, false, {
                                             fileName: "[project]/app/page.tsx",
-                                            lineNumber: 22,
+                                            lineNumber: 53,
                                             columnNumber: 298
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/page.tsx",
-                                    lineNumber: 22,
+                                    lineNumber: 53,
                                     columnNumber: 273
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -199,7 +285,7 @@ function Home() {
                                             children: "PASSWORD"
                                         }, void 0, false, {
                                             fileName: "[project]/app/page.tsx",
-                                            lineNumber: 22,
+                                            lineNumber: 53,
                                             columnNumber: 417
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -210,13 +296,13 @@ function Home() {
                                             required: true
                                         }, void 0, false, {
                                             fileName: "[project]/app/page.tsx",
-                                            lineNumber: 22,
+                                            lineNumber: 53,
                                             columnNumber: 438
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/page.tsx",
-                                    lineNumber: 22,
+                                    lineNumber: 53,
                                     columnNumber: 410
                                 }, this),
                                 error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -225,7 +311,7 @@ function Home() {
                                     children: error
                                 }, void 0, false, {
                                     fileName: "[project]/app/page.tsx",
-                                    lineNumber: 22,
+                                    lineNumber: 53,
                                     columnNumber: 578
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -234,30 +320,30 @@ function Home() {
                                     children: loggingIn ? "Logging in..." : "Log in"
                                 }, void 0, false, {
                                     fileName: "[project]/app/page.tsx",
-                                    lineNumber: 22,
+                                    lineNumber: 53,
                                     columnNumber: 630
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/page.tsx",
-                            lineNumber: 22,
+                            lineNumber: 53,
                             columnNumber: 250
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/page.tsx",
-                    lineNumber: 22,
+                    lineNumber: 53,
                     columnNumber: 189
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.tsx",
-                lineNumber: 22,
+                lineNumber: 53,
                 columnNumber: 144
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.tsx",
-        lineNumber: 22,
+        lineNumber: 53,
         columnNumber: 19
     }, this);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -268,7 +354,7 @@ function Home() {
                 children: "Flag Reports"
             }, void 0, false, {
                 fileName: "[project]/app/page.tsx",
-                lineNumber: 24,
+                lineNumber: 55,
                 columnNumber: 38
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -281,7 +367,7 @@ function Home() {
                                 children: "PikMe"
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 24,
+                                lineNumber: 55,
                                 columnNumber: 152
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -289,13 +375,13 @@ function Home() {
                                 children: "Log out"
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 24,
+                                lineNumber: 55,
                                 columnNumber: 170
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/page.tsx",
-                        lineNumber: 24,
+                        lineNumber: 55,
                         columnNumber: 121
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -303,7 +389,7 @@ function Home() {
                         children: "Flag reports"
                     }, void 0, false, {
                         fileName: "[project]/app/page.tsx",
-                        lineNumber: 24,
+                        lineNumber: 55,
                         columnNumber: 231
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -313,7 +399,7 @@ function Home() {
                                 children: "Flags"
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 24,
+                                lineNumber: 55,
                                 columnNumber: 304
                             }, this),
                             error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -321,7 +407,7 @@ function Home() {
                                 children: error
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 24,
+                                lineNumber: 55,
                                 columnNumber: 326
                             }, this),
                             loadingReports && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -329,7 +415,7 @@ function Home() {
                                 children: "Loading reports..."
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 24,
+                                lineNumber: 55,
                                 columnNumber: 381
                             }, this),
                             !loadingReports && !reports.length && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -337,7 +423,7 @@ function Home() {
                                 children: "No pending reports."
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 24,
+                                lineNumber: 55,
                                 columnNumber: 467
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -348,12 +434,11 @@ function Home() {
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "flag-description",
                                                 children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "flag-clock",
-                                                        children: "◷"
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DrawingPreview, {
+                                                        drawing: report.drawing
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/page.tsx",
-                                                        lineNumber: 24,
+                                                        lineNumber: 55,
                                                         columnNumber: 647
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -364,13 +449,13 @@ function Home() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/page.tsx",
-                                                        lineNumber: 24,
-                                                        columnNumber: 684
+                                                        lineNumber: 55,
+                                                        columnNumber: 689
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/page.tsx",
-                                                lineNumber: 24,
+                                                lineNumber: 55,
                                                 columnNumber: 613
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -382,8 +467,8 @@ function Home() {
                                                         children: "Clear"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/page.tsx",
-                                                        lineNumber: 24,
-                                                        columnNumber: 796
+                                                        lineNumber: 55,
+                                                        columnNumber: 801
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         className: "delete-action",
@@ -391,49 +476,50 @@ function Home() {
                                                         children: "Delete account"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/page.tsx",
-                                                        lineNumber: 24,
-                                                        columnNumber: 877
+                                                        lineNumber: 55,
+                                                        columnNumber: 882
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/page.tsx",
-                                                lineNumber: 24,
-                                                columnNumber: 766
+                                                lineNumber: 55,
+                                                columnNumber: 771
                                             }, this)
                                         ]
                                     }, report.id, true, {
                                         fileName: "[project]/app/page.tsx",
-                                        lineNumber: 24,
+                                        lineNumber: 55,
                                         columnNumber: 567
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/page.tsx",
-                                lineNumber: 24,
+                                lineNumber: 55,
                                 columnNumber: 519
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/page.tsx",
-                        lineNumber: 24,
+                        lineNumber: 55,
                         columnNumber: 277
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/page.tsx",
-                lineNumber: 24,
+                lineNumber: 55,
                 columnNumber: 89
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.tsx",
-        lineNumber: 24,
+        lineNumber: 55,
         columnNumber: 10
     }, this);
 }
 _s(Home, "gyfzu3TG37HRhMHs/y4HvkvHEE8=");
-_c = Home;
-var _c;
-__turbopack_context__.k.register(_c, "Home");
+_c1 = Home;
+var _c, _c1;
+__turbopack_context__.k.register(_c, "DrawingPreview");
+__turbopack_context__.k.register(_c1, "Home");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

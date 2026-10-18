@@ -1,0 +1,30 @@
+/* [project]/app/report-preview.css [app-client] (css) */
+.flag-preview, .flag-preview-fallback {
+  background: #f5f5f5;
+  flex: none;
+  width: 54px;
+  height: 64px;
+}
+
+.flag-preview {
+  display: block;
+}
+
+.flag-preview-fallback {
+  place-items: center;
+  font-size: 24px;
+  display: grid;
+}
+
+@media (max-width: 800px) {
+  .flag-preview, .flag-preview-fallback {
+    width: 38px;
+    height: 44px;
+  }
+
+  .flag-preview-fallback {
+    font-size: 18px;
+  }
+}
+
+/*# sourceMappingURL=app_report-preview_css_1igg3k2-ikub5._.single.css.map*/

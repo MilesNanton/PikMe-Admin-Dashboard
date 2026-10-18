@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/app/report-preview.css"],"sourcesContent":[".flag-preview,\n.flag-preview-fallback {\n  width: 54px;\n  height: 64px;\n  flex: 0 0 auto;\n  background: #f5f5f5;\n}\n\n.flag-preview {\n  display: block;\n}\n\n.flag-preview-fallback {\n  display: grid;\n  place-items: center;\n  font-size: 24px;\n}\n\n@media (max-width: 800px) {\n  .flag-preview,\n  .flag-preview-fallback {\n    width: 38px;\n    height: 44px;\n  }\n\n  .flag-preview-fallback {\n    font-size: 18px;\n  }\n}\n"],"names":[],"mappings":"AAAA;;;;;;;AAQA;;;;AAIA;;;;;;AAMA;EACE;;;;;EAMA"}}]
+}

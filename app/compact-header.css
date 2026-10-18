@@ -25,6 +25,11 @@
   letter-spacing: 0;
 }
 
+.reference-form-wrap h1 {
+  font-weight: 600;
+  text-shadow: 0.35px 0 currentColor;
+}
+
 .flag-brand { height: 80px; }
 .flag-brand span {
   font-family: "Pixelated Elegance", monospace;

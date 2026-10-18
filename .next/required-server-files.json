@@ -9,7 +9,7 @@
     "typedRoutes": false,
     "distDir": ".next",
     "cleanDistDir": true,
-    "assetPrefix": "",
+    "assetPrefix": "/PikMe-Admin-Dashboard",
     "cacheMaxMemorySize": 52428800,
     "configOrigin": "next.config.ts",
     "useFileSystemPublicRoutes": true,
@@ -43,7 +43,7 @@
         256,
         384
       ],
-      "path": "/_next/image",
+      "path": "/PikMe-Admin-Dashboard/_next/image",
       "loader": "default",
       "loaderFile": "",
       "domains": [],
@@ -78,7 +78,7 @@
       "maxInactiveAge": 60000,
       "pagesBufferLength": 5
     },
-    "basePath": "",
+    "basePath": "/PikMe-Admin-Dashboard",
     "sassOptions": {},
     "trailingSlash": false,
     "i18n": null,

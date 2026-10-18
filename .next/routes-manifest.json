@@ -3,8 +3,17 @@
   "pages404": true,
   "appType": "app",
   "caseSensitive": false,
-  "basePath": "",
+  "basePath": "/PikMe-Admin-Dashboard",
   "redirects": [
+    {
+      "source": "/PikMe-Admin-Dashboard/",
+      "destination": "/PikMe-Admin-Dashboard",
+      "basePath": false,
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^/PikMe-Admin-Dashboard/$"
+    },
     {
       "source": "/:path+/",
       "destination": "/:path+",

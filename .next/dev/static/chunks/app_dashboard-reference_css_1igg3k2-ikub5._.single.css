@@ -185,4 +185,33 @@
   }
 }
 
+.flag-actions .dismiss-action {
+  color: #111;
+  background: none;
+  border: 0;
+  flex: 0 0 37px;
+  width: 37px;
+  min-width: 37px;
+  font-size: 18px;
+}
+
+.flag-actions .dismiss-action:hover {
+  background: #f5f5f5;
+}
+
+.flag-actions button:focus-visible {
+  outline-offset: 3px;
+  outline: 2px solid #100ba9;
+}
+
+.flag-actions button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.flag-actions .clear-action {
+  white-space: nowrap;
+  padding-inline: 16px;
+}
+
 /*# sourceMappingURL=app_dashboard-reference_css_1igg3k2-ikub5._.single.css.map*/

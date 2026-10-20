@@ -1,0 +1,27 @@
+/* [project]/app/pixelatedelegance_90edbfd7.module.css [app-client] (css) */
+@font-face {
+  font-family: pixelatedElegance;
+  src: url("../media/pixelated_elegance-s.p.177bk_05i23-g.woff") format("woff");
+  font-display: swap;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: pixelatedElegance Fallback;
+  src: local(Arial);
+  ascent-override: 48.87%;
+  descent-override: 7.0%;
+  line-gap-override: 20.93%;
+  size-adjust: 159.07%;
+}
+
+.pixelatedelegance_90edbfd7-module___I9daG__className {
+  font-family: pixelatedElegance, pixelatedElegance Fallback;
+  font-weight: 400;
+}
+
+.pixelatedelegance_90edbfd7-module___I9daG__variable {
+  --font-pixelated: "pixelatedElegance", "pixelatedElegance Fallback";
+}
+
+/*# sourceMappingURL=app_pixelatedelegance_90edbfd7_module_css_1igg3k2-ikub5._.single.css.map*/

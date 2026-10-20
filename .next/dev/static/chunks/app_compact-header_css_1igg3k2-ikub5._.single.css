@@ -16,13 +16,18 @@
 }
 
 .reference-login {
-  --pixel-font: "Pixelated Elegance", monospace;
+  --pixel-font: var(--font-pixelated), "Pixelated Elegance", monospace;
 }
 
-.reference-logo {
+.reference-logo, .reference-form-wrap h1 {
+  font-family: var(--font-pixelated), "Pixelated Elegance", monospace;
   letter-spacing: 0;
-  font-family: Pixelated Elegance, monospace;
   font-weight: 400;
+}
+
+.reference-form-wrap h1 {
+  text-shadow: .35px 0;
+  font-weight: 600;
 }
 
 .flag-brand {

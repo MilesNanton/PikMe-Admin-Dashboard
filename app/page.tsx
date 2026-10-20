@@ -2,12 +2,12 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from "firebase/auth";
-import { collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, deleteDoc, deleteField, doc, getDoc, onSnapshot, orderBy, query, runTransaction, serverTimestamp, Timestamp } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 
 type Point = { x:number; y:number };
 type DrawingSnapshot = { strokes:Point[][]; width:number; height:number; strokeColor:string; strokeWidth:number; backgroundColor:string };
-type Report = { id:string; reason:string; reportedUserId:string; drawing:DrawingSnapshot|null };
+type Report = { id:string; reason:string; reportedUserId:string; contentType:string; drawing:DrawingSnapshot|null };
 const readableReason=(value:string)=>value.replaceAll("_"," ").replaceAll("-"," ").replace(/\b\w/g,l=>l.toUpperCase());
 
 function readDrawing(value:unknown):DrawingSnapshot|null{
@@ -43,14 +43,37 @@ export default function Home(){
   const [user,setUser]=useState<User|null>(null),[ready,setReady]=useState(false),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[error,setError]=useState(""),[loggingIn,setLoggingIn]=useState(false),[reports,setReports]=useState<Report[]>([]),[loadingReports,setLoadingReports]=useState(false);
 
   useEffect(()=>onAuthStateChanged(auth,async current=>{if(!current){setUser(null);setReady(true);return}try{const admin=await getDoc(doc(db,"admins",current.uid));if(admin.exists()&&admin.data().role==="admin")setUser(current);else{await signOut(auth);setError("This account does not have admin access.")}}catch{await signOut(auth);setError("Could not verify admin access. Check Firestore rules.")}finally{setReady(true)}}),[]);
-  useEffect(()=>{if(!user)return;setLoadingReports(true);const q=query(collection(db,"reports"),orderBy("createdAt","desc"));return onSnapshot(q,async snapshot=>{const latestDrawings=new Map<string,Promise<DrawingSnapshot|null>>();const items=await Promise.all(snapshot.docs.map(async item=>{const data=item.data();const reportedUserId=String(data.reportedUserId??"Unknown user");let drawing=readDrawing(data.contentSnapshot);if(!drawing&&reportedUserId!=="Unknown user"){if(!latestDrawings.has(reportedUserId))latestDrawings.set(reportedUserId,getDoc(doc(db,"nearby_presence",reportedUserId)).then(result=>result.exists()?readDrawing(result.data()):null).catch(()=>null));drawing=await latestDrawings.get(reportedUserId)!}return{id:item.id,reason:String(data.reason??"Community report"),reportedUserId,drawing}}));setReports(items);setLoadingReports(false)},()=>{setError("Could not load reports. Check Firestore rules.");setLoadingReports(false)})},[user]);
+  useEffect(()=>{if(!user)return;setLoadingReports(true);const q=query(collection(db,"reports"),orderBy("createdAt","desc"));return onSnapshot(q,async snapshot=>{const latestDrawings=new Map<string,Promise<DrawingSnapshot|null>>();const items=await Promise.all(snapshot.docs.filter(item=>item.data().status==="pending").map(async item=>{const data=item.data();const reportedUserId=String(data.reportedUserId??"Unknown user");let drawing=readDrawing(data.contentSnapshot);if(!drawing&&reportedUserId!=="Unknown user"){if(!latestDrawings.has(reportedUserId))latestDrawings.set(reportedUserId,getDoc(doc(db,"nearby_presence",reportedUserId)).then(result=>result.exists()?readDrawing(result.data()):null).catch(()=>null));drawing=await latestDrawings.get(reportedUserId)!}return{id:item.id,reason:String(data.reason??"Community report"),reportedUserId,contentType:String(data.contentType??""),drawing}}));setReports(items);setLoadingReports(false)},()=>{setError("Could not load reports. Check Firestore rules.");setLoadingReports(false)})},[user]);
 
   async function login(event:FormEvent){event.preventDefault();setLoggingIn(true);setError("");try{const credential=await signInWithEmailAndPassword(auth,email.trim(),password);const admin=await getDoc(doc(db,"admins",credential.user.uid));if(!admin.exists()||admin.data().role!=="admin"){await signOut(auth);setError("This account does not have admin access.");return}setUser(credential.user)}catch{setError("Invalid email or password.")}finally{setLoggingIn(false)}}
-  async function clearReport(report:Report){if(window.confirm("Clear this report?"))await deleteDoc(doc(db,"reports",report.id))}
-  async function deleteReportedUser(report:Report){if(report.reportedUserId==="Unknown user"){setError("This report does not include a reported user ID.");return}if(!window.confirm(`Delete user ${report.reportedUserId} from Firestore?`))return;await deleteDoc(doc(db,"users",report.reportedUserId));await deleteDoc(doc(db,"reports",report.id))}
+  async function dismissReport(report:Report){
+    setError("");
+    try{await deleteDoc(doc(db,"reports",report.id))}catch{setError("Could not remove the report. Check Firestore permissions.")}
+  }
+  async function removeDrawing(report:Report){
+    if(report.contentType!=="pik"||!user)return;
+    if(!window.confirm("Remove the reported drawing?"))return;
+    setError("");
+    try{
+      await runTransaction(db,async transaction=>{
+        const reportRef=doc(db,"reports",report.id);
+        const snapshot=await transaction.get(reportRef);
+        const data=snapshot.data();
+        if(!data||data.status!=="pending"||data.contentType!=="pik")throw new Error("This report is no longer pending.");
+        const owner=data.reportedUserId;
+        const version=data.contentSnapshot?.pikUpdatedAt;
+        if(typeof owner!=="string"||!owner||owner.includes("/")||!(version instanceof Timestamp))throw new Error("This report cannot identify the drawing version safely.");
+        const presenceRef=doc(db,"nearby_presence",owner);
+        const presence=(await transaction.get(presenceRef)).data();
+        if(!presence||presence.pikId!==data.contentId||!(presence.pikUpdatedAt instanceof Timestamp)||!presence.pikUpdatedAt.isEqual(version))throw new Error("The reported drawing is no longer current. You can dismiss this report with X.");
+        transaction.update(presenceRef,{pikStrokes:deleteField(),pikTags:deleteField(),pikCanvasWidth:deleteField(),pikCanvasHeight:deleteField(),pikUpdatedAt:deleteField(),hasPublishedPik:false});
+        transaction.update(reportRef,{status:"content_removed",moderatedAt:serverTimestamp(),moderatedBy:user.uid});
+      });
+    }catch(cause){setError(cause instanceof Error?cause.message:"Could not remove the drawing.")}
+  }
 
   if(!ready)return <main className="reference-login"><header className="reference-header"><span className="reference-logo">PikMe</span></header></main>;
   if(!user)return <main className="reference-login"><header className="reference-header"><span className="reference-logo">PikMe</span></header><section className="reference-login-content"><div className="reference-form-wrap"><h1>Log in to PikMe</h1><form onSubmit={login}><label><span>EMAIL</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" required/></label><label><span>PASSWORD</span><input type="password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" required/></label>{error&&<p className="login-error" role="alert">{error}</p>}<button type="submit" disabled={loggingIn}>{loggingIn?"Logging in...":"Log in"}</button></form></div></section></main>;
 
-  return <main className="flag-page"><div className="flag-page-label">Flag Reports</div><section className="flag-shell"><header className="flag-brand"><span>PikMe</span><button onClick={()=>signOut(auth)}>Log out</button></header><div className="flag-title">Flag reports</div><div className="flag-card"><h1>Flags</h1>{error&&<p className="flag-error">{error}</p>}{loadingReports&&<p className="flag-message">Loading reports...</p>}{!loadingReports&&!reports.length&&<p className="flag-message">No pending reports.</p>}<div className="flag-list">{reports.map(report=><article className="flag-row" key={report.id}><div className="flag-description"><DrawingPreview drawing={report.drawing}/><span>{readableReason(report.reason)} - User #{report.reportedUserId}</span></div><div className="flag-actions"><button className="clear-action" onClick={()=>clearReport(report)}>Clear</button><button className="delete-action" onClick={()=>deleteReportedUser(report)}>Delete account</button></div></article>)}</div></div></section></main>;
+  return <main className="flag-page"><div className="flag-page-label">Flag Reports</div><section className="flag-shell"><header className="flag-brand"><span>PikMe</span><button onClick={()=>signOut(auth)}>Log out</button></header><div className="flag-title">Flag reports</div><div className="flag-card"><h1>Flags</h1>{error&&<p className="flag-error">{error}</p>}{loadingReports&&<p className="flag-message">Loading reports...</p>}{!loadingReports&&!reports.length&&<p className="flag-message">No pending reports.</p>}<div className="flag-list">{reports.map(report=><article className="flag-row" key={report.id}><div className="flag-description"><DrawingPreview drawing={report.drawing}/><span>{readableReason(report.reason)} - User #{report.reportedUserId}</span></div><div className="flag-actions"><button className="clear-action" disabled={report.contentType!=="pik"} title={report.contentType!=="pik"?"This report is not for a drawing":undefined} onClick={()=>removeDrawing(report)}>Remove drawing</button><button className="dismiss-action" aria-label="Remove report from list" title="Remove report from list" onClick={()=>dismissReport(report)}>X</button></div></article>)}</div></div></section></main>;
 }
